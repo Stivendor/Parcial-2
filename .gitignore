@@ -6,13 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-# Virtual environment
-venv/
-.env/
-.venv/
-env/
-ENV/
-*.env
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
