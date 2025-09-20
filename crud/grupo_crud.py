@@ -78,16 +78,7 @@ def update_grupo(db: Session, grupo_id: uuid.UUID, nombre: Optional[str] = None)
 
 
 def delete_grupo(db: Session, grupo_id: uuid.UUID) -> bool:
-    """
-    Elimina un grupo de la base de datos.
 
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        grupo_id (uuid.UUID): ID único del grupo.
-
-    Returns:
-        bool: True si se eliminó exitosamente, False si no existe.
-    """
     grupo = db.query(Grupo).filter(Grupo.id_grupo == grupo_id).first()
     if grupo is None:
         return False

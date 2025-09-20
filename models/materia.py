@@ -27,18 +27,19 @@ class Materia(Base):
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
     fecha_edicion = Column(DateTime(timezone=True), onupdate=func.now())
 
-    """ Relación con profesor (uno a muchos)"""
     profesor_id = Column(
         UUID(as_uuid=True), ForeignKey("profesores.id_profesor"), nullable=True
     )
     profesor = relationship("Profesor", backref="materias")
 
-    """ Relación con estudiantes (muchos a muchos)"""
     estudiantes = relationship(
         "Estudiante",
         secondary=materia_estudiante,
         backref="materias",
     )
+
+    """ Relación con Nota (uno a muchos) """
+    notas = relationship("Nota", back_populates="materia")
 
     def __repr__(self):
         return f"<Materia(id_materia={self.id_materia}, nombre='{self.nombre}', codigo='{self.codigo}')>"

@@ -23,7 +23,7 @@ def get_auditoria(db: Session) -> List[Auditoria]:
 def ver_auditoria(db):
     auditorias = db.query(Auditoria).order_by(Auditoria.fecha.desc()).all()
     if not auditorias:
-        print("⚠️ No hay registros de auditoría.")
+        print(" No hay registros de auditoría.")
         return
 
     print("\n=== REGISTRO DE AUDITORÍA ===")
