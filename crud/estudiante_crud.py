@@ -1,95 +1,64 @@
-
-from sqlalchemy.orm import Session
 from models.estudiante import Estudiante
+from models.persona import Persona
+from models import Auditoria
+from sqlalchemy.orm import Session
 import uuid
-from typing import List, Optional
 
+def create_estudiante(db, nombre, email, telefono, carrera, semestre):
+    persona = Persona(
+        nombre=nombre,
+        email=email,
+        telefono=telefono
+    )
+    db.add(persona)
+    db.commit()
+    db.refresh(persona)
+    
 
-def create_estudiante(db: Session, matricula: str, persona_id: uuid.UUID) -> Estudiante:
-    """
-    Crea un nuevo estudiante en la base de datos.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        matricula (str): Número de matrícula del estudiante.
-        persona_id (uuid.UUID): ID de la persona asociada al estudiante.
-
-    Returns:
-        Estudiante: Objeto del estudiante recién creado.
-    """
-    estudiante = Estudiante(id_estudiante=persona_id, matricula=matricula)
+    estudiante = Estudiante(
+        id_estudiante = persona.id_persona,
+        persona_id = persona.id_persona,
+        carrera=carrera,
+        semestre=semestre
+    )
+    
     db.add(estudiante)
     db.commit()
     db.refresh(estudiante)
+
     return estudiante
 
 
-def get_estudiante_by_id(db: Session, estudiante_id: uuid.UUID) -> Optional[Estudiante]:
-    """
-    Obtiene un estudiante por su ID.
+def listar_estudiantes(db: Session):
+    estudiantes = db.query(Estudiante).all()
+    for e in estudiantes:
+        print(f"{e.id_estudiante} - {e.persona.nombre} - {e.carrera} - {e.semestre}")
 
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        estudiante_id (uuid.UUID): ID único del estudiante.
+def actualizar_estudiante(db: Session, estudiante_id: uuid.UUID, usuario_id: uuid.UUID):
+    estudiante = db.query(Estudiante).get(estudiante_id)
+    if not estudiante:
+        print("Estudiante no encontrado")
+        return
 
-    Returns:
-        Optional[Estudiante]: El estudiante si existe, en caso contrario None.
-    """
-    return db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
+    estudiante.carrera = input(f"Carrera ({estudiante.carrera}): ") or estudiante.carrera
+    estudiante.semestre = input(f"Semestre ({estudiante.semestre}): ") or estudiante.semestre
+    db.add(estudiante)
 
-
-def get_all_estudiantes(db: Session) -> List[Estudiante]:
-    """
-    Obtiene todos los estudiantes registrados.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-
-    Returns:
-        List[Estudiante]: Lista de todos los estudiantes.
-    """
-    return db.query(Estudiante).all()
-
-
-def update_estudiante(db: Session, estudiante_id: uuid.UUID, matricula: Optional[str] = None) -> Optional[Estudiante]:
-    """
-    Actualiza los datos de un estudiante existente.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        estudiante_id (uuid.UUID): ID único del estudiante.
-        matricula (Optional[str], optional): Nueva matrícula si se desea actualizar.
-
-    Returns:
-        Optional[Estudiante]: El estudiante actualizado o None si no existe.
-    """
-    estudiante = db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
-    if estudiante is None:
-        return None
-
-    if matricula is not None:
-        estudiante.matricula = matricula
+    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Actualizó estudiante {estudiante.persona.nombre}", tabla="estudiantes")
+    db.add(auditoria)
 
     db.commit()
-    db.refresh(estudiante)
-    return estudiante
+    print(f" Estudiante {estudiante.persona.nombre} actualizado")
 
-
-def delete_estudiante(db: Session, estudiante_id: uuid.UUID) -> bool:
-    """
-    Elimina un estudiante de la base de datos.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        estudiante_id (uuid.UUID): ID único del estudiante.
-
-    Returns:
-        bool: True si se eliminó exitosamente, False si no existe.
-    """
-    estudiante = db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
-    if estudiante is None:
-        return False
+def eliminar_estudiante(db: Session, estudiante_id: uuid.UUID, usuario_id: uuid.UUID):
+    estudiante = db.query(Estudiante).get(estudiante_id)
+    if not estudiante:
+        print("Estudiante no encontrado")
+        return
 
     db.delete(estudiante)
+    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Eliminó estudiante {estudiante.persona.nombre}", tabla="estudiantes")
+    db.add(auditoria)
+
     db.commit()
-    return True
+    print(f" Estudiante {estudiante.persona.nombre} eliminado")
