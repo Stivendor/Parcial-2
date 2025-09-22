@@ -1,4 +1,3 @@
-################### usuario_crud ######################
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from models.usuarios import Usuario

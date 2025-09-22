@@ -1,4 +1,4 @@
-##################### materia #############################
+""" materia"""
 import uuid
 from database.config import Base
 from sqlalchemy import Column, DateTime, ForeignKey, String, Integer, Table

@@ -15,7 +15,7 @@ def create_estudiante(db: Session, nombre: str, email: str, telefono: str, carre
     db.commit()
     db.refresh(estudiante)
 
-    # Auditoría: creación de estudiante
+    """ Auditoría: creación de estudiante"""
     if usuario_id:
         from models.auditoria import Auditoria
         auditoria = Auditoria(
@@ -46,7 +46,7 @@ def actualizar_estudiante(
 ):
     estudiante = db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
     if estudiante:
-        # Buscar persona asociada para actualizar nombre, email y teléfono
+        """ Buscar persona asociada para actualizar nombre, email y teléfono """
         persona = db.query(Persona).filter(Persona.id_persona == estudiante.persona_id).first()
         if persona:
             if nombre is not None:
@@ -56,7 +56,7 @@ def actualizar_estudiante(
             if telefono is not None:
                 persona.telefono = telefono
 
-        # Actualizar datos del estudiante
+        """ Actualizar datos del estudiante"""
         if carrera is not None:
             estudiante.carrera = carrera
         if semestre is not None:
@@ -65,7 +65,7 @@ def actualizar_estudiante(
         db.commit()
         db.refresh(estudiante)
 
-        # Auditoría: actualización de estudiante
+        """ Auditoría: actualización de estudiante"""
         if usuario_id:
             from models.auditoria import Auditoria
             auditoria = Auditoria(
@@ -85,7 +85,7 @@ def eliminar_estudiante(db: Session, estudiante_id: uuid.UUID, usuario_id=None):
         db.delete(estudiante)
         db.commit()
 
-        # Auditoría: eliminación de estudiante
+        """ Auditoría: eliminación de estudiante"""
         if usuario_id:
             from models.auditoria import Auditoria
             auditoria = Auditoria(

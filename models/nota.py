@@ -1,4 +1,4 @@
-################## nota #####################
+""" nota """
 
 import uuid
 from database.config import Base

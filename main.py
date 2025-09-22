@@ -96,7 +96,7 @@ def menu_estudiantes(usuario):
 
             eliminado = eliminar_estudiante(db, estudiante_uuid, usuario.id_usuario)
             if eliminado:
-                print("🗑️ Estudiante eliminado correctamente.")
+                print(" Estudiante eliminado correctamente.")
             else:
                 print("No se encontró estudiante con ese ID.")
 
@@ -130,7 +130,7 @@ def menu_profesores(usuario):
             print(" Profesor creado correctamente.")
 
         elif opcion == "3":
-            # Listar antes para que el usuario vea los IDs
+            """ Listar antes para que el usuario vea los IDs"""
             profesores = listar_profesores(db)
             if not profesores:
                 print(" No hay profesores registrados.")
@@ -227,7 +227,7 @@ def menu_materias(usuario, db):
                     print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
             else:
                 print("No hay materias registradas.")
-                continue  # Salir de la opción si no hay materias
+                continue  
 
             materia_id_input = input("ID de la materia a actualizar: ").strip()
             try:
@@ -241,7 +241,7 @@ def menu_materias(usuario, db):
             creditos_input = input("Nuevos créditos (Enter para omitir): ").strip()
             creditos = int(creditos_input) if creditos_input else None
 
-            # Llamada correcta a actualizar_materia, sin tocar profesor_id
+            ''' Llamada correcta a actualizar_materia, sin tocar profesor_id'''
             materia_actualizada = actualizar_materia(db, materia_id, nombre, codigo, creditos)
 
             print("\n")
@@ -372,6 +372,7 @@ def main():
     usuario_logeado = None
 
     while intentos < max_intentos:
+        print("Usuario: usuario, Contraseña: 12345")
         username = input("Usuario: ")
         password = input("Contraseña: ")
 
