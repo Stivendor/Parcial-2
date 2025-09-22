@@ -367,16 +367,27 @@ def menu_principal(usuario, db):
 
 def main():
     db: Session = SessionLocal()
-    username = input("Usuario: ")
-    password = input("Contraseña: ")
+    max_intentos = 3
+    intentos = 0
+    usuario_logeado = None
 
-    usuario_logeado = autenticar_usuario(db, username, password)
+    while intentos < max_intentos:
+        username = input("Usuario: ")
+        password = input("Contraseña: ")
 
-    if usuario_logeado:
-        print(f"Bienvenido {usuario_logeado.username} (rol: {usuario_logeado.rol})")
-        menu_principal(usuario_logeado, db)
-    else:
-        print("Usuario o contraseña incorrectos")
+        usuario_logeado = autenticar_usuario(db, username, password)
+
+        if usuario_logeado:
+            print(f"\n Bienvenido {usuario_logeado.username} (rol: {usuario_logeado.rol})")
+            menu_principal(usuario_logeado, db)
+            break
+        else:
+            intentos += 1
+            print(f" Usuario o contraseña incorrectos. Intento {intentos}/{max_intentos}")
+
+    if not usuario_logeado:
+        print("\n Has superado el número máximo de intentos. Intentalo de nuevo")
+
 
 
 if __name__ == "__main__":
