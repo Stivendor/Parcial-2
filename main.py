@@ -319,7 +319,7 @@ def menu_notas(usuario, db):
 
             id_nota = input("ID de la nota a actualizar: ").strip()
             nuevo_valor = float(input("Nuevo valor de la nota: "))
-            nota_actualizada = update_nota(db, id_nota, valor=nuevo_valor)
+            nota_actualizada = actualizar_nota(db, id_nota, valor=nuevo_valor)
             if nota_actualizada:
                 print(f"Nota actualizada: {nota_actualizada}")
             else:
