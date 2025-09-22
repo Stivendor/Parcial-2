@@ -1,6 +1,3 @@
-"""
-Configuración de la base de datos PostgreSQL con Neon
-"""
 
 import os
 
@@ -36,9 +33,7 @@ Base = declarative_base()
 
 
 def get_db():
-    """
-    Generador de sesiones de base de datos
-    """
+   
     db = SessionLocal()
     try:
         yield db
@@ -47,7 +42,5 @@ def get_db():
 
 
 def create_tables():
-    """
-    Crear todas las tablas definidas en los modelos
-    """
+    
     Base.metadata.create_all(bind=engine)

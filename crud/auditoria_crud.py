@@ -1,13 +1,12 @@
+
 from typing import List, Optional
 import uuid
 from sqlalchemy.orm import Session
-from models import Auditoria
+from models.auditoria import Auditoria
 
 
 def create_auditoria(db: Session, usuario_id: uuid.UUID | None, accion: str, tabla: str):
-    """
-    Registra cualquier acción en la tabla Auditoria
-    """
+   
     auditoria = Auditoria(
         usuario_id=usuario_id,
         accion=accion,

@@ -1,4 +1,4 @@
-# crud_persona.py
+
 from sqlalchemy.orm import Session
 from models.persona import Persona
 import uuid
