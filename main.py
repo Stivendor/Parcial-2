@@ -3,12 +3,26 @@ from database.config import SessionLocal
 from sqlalchemy.orm import Session
 from models.auditoria import Auditoria
 from crud.usuario_crud import autenticar_usuario
-from crud.estudiante_crud import create_estudiante, listar_estudiantes, actualizar_estudiante, eliminar_estudiante
-from crud.profesor_crud import create_profesor, listar_profesores, actualizar_profesor, eliminar_profesor
-from crud.materia_crud import create_materia, listar_materias, actualizar_materia, eliminar_materia
+from crud.estudiante_crud import (
+    create_estudiante,
+    listar_estudiantes,
+    actualizar_estudiante,
+    eliminar_estudiante,
+)
+from crud.profesor_crud import (
+    create_profesor,
+    listar_profesores,
+    actualizar_profesor,
+    eliminar_profesor,
+)
+from crud.materia_crud import (
+    create_materia,
+    listar_materias,
+    actualizar_materia,
+    eliminar_materia,
+)
 from crud.nota_crud import create_nota, listar_notas, actualizar_nota, eliminar_nota
 from crud.auditoria_crud import ver_auditoria
-
 
 
 def menu_estudiantes(usuario):
@@ -28,7 +42,9 @@ def menu_estudiantes(usuario):
                 print(" No hay estudiantes registrados.")
             else:
                 for est in estudiantes:
-                    print(f"ID: {est.id_estudiante}, Nombre: {est.persona.nombre}, Carrera: {est.carrera}, Semestre: {est.semestre}")
+                    print(
+                        f"ID: {est.id_estudiante}, Nombre: {est.persona.nombre}, Carrera: {est.carrera}, Semestre: {est.semestre}"
+                    )
 
         elif opcion == "2":
             nombre = input("Nombre: ")
@@ -36,7 +52,9 @@ def menu_estudiantes(usuario):
             telefono = input("Teléfono: ")
             carrera = input("Carrera: ")
             semestre = int(input("Semestre: "))
-            create_estudiante(db, nombre, email, telefono, carrera, semestre, usuario.id_usuario)
+            create_estudiante(
+                db, nombre, email, telefono, carrera, semestre, usuario.id_usuario
+            )
             print("Estudiante creado correctamente.")
 
         elif opcion == "3":
@@ -46,7 +64,9 @@ def menu_estudiantes(usuario):
                 continue
 
             for est in estudiantes:
-                print(f"{est.id_estudiante} - {est.persona.nombre} ({est.carrera}, Sem {est.semestre})")
+                print(
+                    f"{est.id_estudiante} - {est.persona.nombre} ({est.carrera}, Sem {est.semestre})"
+                )
 
             estudiante_id = input("\nID del estudiante a actualizar: ")
             try:
@@ -70,7 +90,7 @@ def menu_estudiantes(usuario):
                 nuevo_telefono,
                 nueva_carrera,
                 nuevo_semestre,
-                usuario.id_usuario
+                usuario.id_usuario,
             )
 
             if estudiante_actualizado:
@@ -145,8 +165,12 @@ def menu_profesores(usuario):
 
             nuevo_nombre = input("Nuevo nombre (deja vacío para no cambiar): ") or None
             nuevo_email = input("Nuevo email (deja vacío para no cambiar): ") or None
-            nuevo_telefono = input("Nuevo teléfono (deja vacío para no cambiar): ") or None
-            nueva_especialidad = input("Nueva especialidad (deja vacío para no cambiar): ") or None
+            nuevo_telefono = (
+                input("Nuevo teléfono (deja vacío para no cambiar): ") or None
+            )
+            nueva_especialidad = (
+                input("Nueva especialidad (deja vacío para no cambiar): ") or None
+            )
 
             profesor_actualizado = actualizar_profesor(
                 db,
@@ -154,7 +178,7 @@ def menu_profesores(usuario):
                 nuevo_nombre,
                 nuevo_email,
                 nuevo_telefono,
-                nueva_especialidad
+                nueva_especialidad,
             )
 
             if profesor_actualizado:
@@ -203,7 +227,9 @@ def menu_materias(usuario, db):
             if materias:
                 print("\n--- Lista de Materias ---")
                 for mat in materias:
-                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+                    print(
+                        f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}"
+                    )
             else:
                 print("No hay materias registradas.")
 
@@ -216,7 +242,9 @@ def menu_materias(usuario, db):
                 print("No hay profesores registrados.")
                 continue
             profesor_id = input("ID del profesor (o Enter si no tiene): ") or None
-            nueva_materia = create_materia(db, nombre, codigo, creditos, profesor_id, usuario.id_usuario)
+            nueva_materia = create_materia(
+                db, nombre, codigo, creditos, profesor_id, usuario.id_usuario
+            )
             print(f" Materia creada: {nueva_materia.nombre}")
 
         elif opcion == "3":
@@ -224,7 +252,9 @@ def menu_materias(usuario, db):
             if materias:
                 print("\n--- Lista de Materias ---")
                 for mat in materias:
-                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+                    print(
+                        f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}"
+                    )
             else:
                 print("No hay materias registradas.")
                 continue  
@@ -241,18 +271,23 @@ def menu_materias(usuario, db):
             creditos_input = input("Nuevos créditos (Enter para omitir): ").strip()
             creditos = int(creditos_input) if creditos_input else None
 
-            ''' Llamada correcta a actualizar_materia, sin tocar profesor_id'''
             materia_actualizada = actualizar_materia(db, materia_id, nombre, codigo, creditos)
 
             print("\n")
-            print("Materia actualizada correctamente." if materia_actualizada else "Materia no encontrada.")
-                        
+            print(
+                "Materia actualizada correctamente."
+                if materia_actualizada
+                else "Materia no encontrada."
+            )
+
         elif opcion == "4":
             materias = listar_materias(db)
             if materias:
                 print("\n--- Lista de Materias ---")
                 for mat in materias:
-                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+                    print(
+                        f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}"
+                    )
             materia_id = input("ID de la materia a eliminar: ").strip()
             materia_eliminada = eliminar_materia(db, materia_id)
             if materia_eliminada:
@@ -264,6 +299,7 @@ def menu_materias(usuario, db):
             break
         else:
             print(" Opción no válida.")
+
 
 def menu_notas(usuario, db):
     while True:
@@ -279,7 +315,9 @@ def menu_notas(usuario, db):
             if notas:
                 print("\n--- LISTADO DE NOTAS ---")
                 for nota in notas:
-                    print(f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}")
+                    print(
+                        f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}"
+                    )
             else:
                 print("No hay notas registradas.")
 
@@ -315,7 +353,9 @@ def menu_notas(usuario, db):
                 continue
             print("\n--- LISTADO DE NOTAS ---")
             for nota in notas:
-                print(f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}")
+                print(
+                    f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}"
+                )
 
             id_nota = input("ID de la nota a actualizar: ").strip()
             nuevo_valor = float(input("Nuevo valor de la nota: "))

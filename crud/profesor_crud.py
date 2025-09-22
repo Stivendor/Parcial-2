@@ -4,12 +4,12 @@ from models.persona import Persona
 from models.profesor import Profesor
 from sqlalchemy.orm import joinedload
 
-def create_profesor(db: Session, nombre: str, email: str, telefono: str, especialidad: str):
+
+def create_profesor(
+    db: Session, nombre: str, email: str, telefono: str, especialidad: str
+):
     nueva_persona = Persona(
-        id_persona=uuid.uuid4(),
-        nombre=nombre,
-        email=email,
-        telefono=telefono
+        id_persona=uuid.uuid4(), nombre=nombre, email=email, telefono=telefono
     )
     db.add(nueva_persona)
     db.commit()
@@ -18,7 +18,7 @@ def create_profesor(db: Session, nombre: str, email: str, telefono: str, especia
     profesor = Profesor(
         id_profesor=uuid.uuid4(),
         persona_id=nueva_persona.id_persona,
-        especialidad=especialidad
+        especialidad=especialidad,
     )
     db.add(profesor)
     db.commit()
@@ -30,7 +30,9 @@ def create_profesor(db: Session, nombre: str, email: str, telefono: str, especia
 def listar_profesores(db: Session):
     profesores = db.query(Profesor).options(joinedload(Profesor.persona)).all()
     for p in profesores:
-        print(f"ID: {p.id_profesor}, Nombre: {p.persona.nombre}, Email: {p.persona.email}, Teléfono: {p.persona.telefono}, Especialidad: {p.especialidad}")
+        print(
+            f"ID: {p.id_profesor}, Nombre: {p.persona.nombre}, Email: {p.persona.email}, Teléfono: {p.persona.telefono}, Especialidad: {p.especialidad}"
+        )
     return profesores
 
 
@@ -40,11 +42,13 @@ def actualizar_profesor(
     nuevo_nombre: str = None,
     nuevo_email: str = None,
     nuevo_telefono: str = None,
-    nueva_especialidad: str = None
+    nueva_especialidad: str = None,
 ):
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
     if profesor:
-        persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
+        persona = (
+            db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
+        )
         if persona:
             if nuevo_nombre:
                 persona.nombre = nuevo_nombre
