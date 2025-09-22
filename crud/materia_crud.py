@@ -1,4 +1,3 @@
-# materia_crud.py
 import uuid
 from sqlalchemy.orm import Session
 from models.materia import Materia
@@ -66,7 +65,7 @@ def actualizar_materia(
     if nombre:
         materia.nombre = nombre
     if codigo is not None and codigo != "":
-        materia.codigo = codigo  # ahora es opcional
+        materia.codigo = codigo
     if creditos is not None:
         materia.creditos = creditos
 

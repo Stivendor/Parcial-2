@@ -1,5 +1,3 @@
-################## persona #####################
-
 import uuid
 from database.config import Base
 from sqlalchemy import Column, DateTime, String, Integer

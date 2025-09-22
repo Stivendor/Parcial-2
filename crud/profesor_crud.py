@@ -28,7 +28,6 @@ def create_profesor(
 
 
 def listar_profesores(db: Session):
-
     profesores = db.query(Profesor).options(joinedload(Profesor.persona)).all()
     for p in profesores:
         print(
@@ -71,10 +70,7 @@ def actualizar_profesor(
 def eliminar_profesor(db: Session, profesor_id: uuid.UUID):
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
     if profesor:
-        # Eliminar también la persona asociada
-        persona = (
-            db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
-        )
+        persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
         if persona:
             db.delete(persona)
         db.delete(profesor)

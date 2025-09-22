@@ -1,5 +1,3 @@
-################## nota #####################
-
 import uuid
 from database.config import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Float
@@ -25,7 +23,6 @@ class Nota(Base):
         UUID(as_uuid=True), ForeignKey("materias.id_materia"), nullable=False
     )
 
-    # Aquí la nota debe ser un número, no un UUID
     valor = Column(Float, nullable=False)
 
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())

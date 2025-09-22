@@ -56,12 +56,7 @@ def actualizar_estudiante(
         db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
     )
     if estudiante:
-
-        persona = (
-            db.query(Persona)
-            .filter(Persona.id_persona == estudiante.persona_id)
-            .first()
-        )
+        persona = db.query(Persona).filter(Persona.id_persona == estudiante.persona_id).first()
         if persona:
             if nombre is not None:
                 persona.nombre = nombre

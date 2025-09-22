@@ -116,7 +116,7 @@ def menu_estudiantes(usuario):
 
             eliminado = eliminar_estudiante(db, estudiante_uuid, usuario.id_usuario)
             if eliminado:
-                print("🗑️ Estudiante eliminado correctamente.")
+                print(" Estudiante eliminado correctamente.")
             else:
                 print("No se encontró estudiante con ese ID.")
 
@@ -150,7 +150,7 @@ def menu_profesores(usuario):
             print(" Profesor creado correctamente.")
 
         elif opcion == "3":
-            # Listar antes para que el usuario vea los IDs
+            """ Listar antes para que el usuario vea los IDs"""
             profesores = listar_profesores(db)
             if not profesores:
                 print(" No hay profesores registrados.")
@@ -257,7 +257,7 @@ def menu_materias(usuario, db):
                     )
             else:
                 print("No hay materias registradas.")
-                continue  # Salir de la opción si no hay materias
+                continue  
 
             materia_id_input = input("ID de la materia a actualizar: ").strip()
             try:
@@ -271,10 +271,7 @@ def menu_materias(usuario, db):
             creditos_input = input("Nuevos créditos (Enter para omitir): ").strip()
             creditos = int(creditos_input) if creditos_input else None
 
-            # Llamada correcta a actualizar_materia, sin tocar profesor_id
-            materia_actualizada = actualizar_materia(
-                db, materia_id, nombre, codigo, creditos
-            )
+            materia_actualizada = actualizar_materia(db, materia_id, nombre, codigo, creditos)
 
             print("\n")
             print(
@@ -410,16 +407,28 @@ def menu_principal(usuario, db):
 
 def main():
     db: Session = SessionLocal()
-    username = input("Usuario: ")
-    password = input("Contraseña: ")
+    max_intentos = 3
+    intentos = 0
+    usuario_logeado = None
 
-    usuario_logeado = autenticar_usuario(db, username, password)
+    while intentos < max_intentos:
+        print("Usuario: usuario, Contraseña: 12345")
+        username = input("Usuario: ")
+        password = input("Contraseña: ")
 
-    if usuario_logeado:
-        print(f"Bienvenido {usuario_logeado.username} (rol: {usuario_logeado.rol})")
-        menu_principal(usuario_logeado, db)
-    else:
-        print("Usuario o contraseña incorrectos")
+        usuario_logeado = autenticar_usuario(db, username, password)
+
+        if usuario_logeado:
+            print(f"\n Bienvenido {usuario_logeado.username} (rol: {usuario_logeado.rol})")
+            menu_principal(usuario_logeado, db)
+            break
+        else:
+            intentos += 1
+            print(f" Usuario o contraseña incorrectos. Intento {intentos}/{max_intentos}")
+
+    if not usuario_logeado:
+        print("\n Has superado el número máximo de intentos. Intentalo de nuevo")
+
 
 
 if __name__ == "__main__":
