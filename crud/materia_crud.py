@@ -1,99 +1,85 @@
-# crud_materia.py
+import uuid
 from sqlalchemy.orm import Session
 from models.materia import Materia
-import uuid
-from typing import List, Optional
+from models.profesor import Profesor
 
 
-def create_materia(db: Session, nombre: str, codigo: str, profesor_id: Optional[uuid.UUID] = None) -> Materia:
-    """
-    Crea una nueva materia en la base de datos.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        nombre (str): Nombre de la materia.
-        codigo (str): Código único de la materia.
-        profesor_id (Optional[uuid.UUID]): ID del profesor asociado (opcional).
-
-    Returns:
-        Materia: Objeto de la materia recién creada.
-    """
-    materia = Materia(nombre=nombre, codigo=codigo, profesor_id=profesor_id)
+def create_materia(
+    db: Session,
+    nombre: str,
+    codigo: str,
+    creditos: int,
+    profesor_id: uuid.UUID = None,
+    usuario_id=None,
+):
+    materia = Materia(
+        nombre=nombre, codigo=codigo, creditos=creditos, profesor_id=profesor_id
+    )
     db.add(materia)
     db.commit()
     db.refresh(materia)
+
+    if usuario_id:
+        from models.auditoria import Auditoria
+
+        auditoria = Auditoria(
+            usuario_id=usuario_id, accion="Creación de materia", tabla="materias"
+        )
+        db.add(auditoria)
+        db.commit()
+
     return materia
 
 
-def get_materia_by_id(db: Session, materia_id: uuid.UUID) -> Optional[Materia]:
-    """
-    Obtiene una materia por su ID.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        materia_id (uuid.UUID): ID único de la materia.
-
-    Returns:
-        Optional[Materia]: La materia si existe, en caso contrario None.
-    """
-    return db.query(Materia).filter(Materia.id_materia == materia_id).first()
-
-
-def get_all_materias(db: Session) -> List[Materia]:
-    """
-    Obtiene todas las materias registradas.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-
-    Returns:
-        List[Materia]: Lista de todas las materias.
-    """
-    return db.query(Materia).all()
+def listar_materias(db: Session):
+    materias = db.query(Materia).all()
+    for m in materias:
+        profesor_nombre = (
+            m.profesor.persona.nombre if m.profesor else "Sin profesor asignado"
+        )
+        print(
+            f"""
+        ID: {m.id_materia}
+        Nombre: {m.nombre}
+        Código: {m.codigo}
+        Créditos: {m.creditos}
+        Profesor: {profesor_nombre}
+        """
+        )
+    return materias
 
 
-def update_materia(db: Session, materia_id: uuid.UUID, nombre: Optional[str] = None, codigo: Optional[str] = None) -> Optional[Materia]:
-    """
-    Actualiza los datos de una materia existente.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        materia_id (uuid.UUID): ID único de la materia.
-        nombre (Optional[str]): Nuevo nombre de la materia.
-        codigo (Optional[str]): Nuevo código de la materia.
-
-    Returns:
-        Optional[Materia]: La materia actualizada o None si no existe.
-    """
+def actualizar_materia(
+    db: Session,
+    materia_id: uuid.UUID,
+    nombre: str = None,
+    codigo: str = None,
+    creditos: int = None,
+    profesor_id: uuid.UUID = None,
+):
     materia = db.query(Materia).filter(Materia.id_materia == materia_id).first()
-    if materia is None:
+    if not materia:
+        print("No se encontró ninguna materia con ese ID.")
         return None
 
-    if nombre is not None:
+    if nombre:
         materia.nombre = nombre
-    if codigo is not None:
+    if codigo is not None and codigo != "":
         materia.codigo = codigo
+    if creditos is not None:
+        materia.creditos = creditos
 
     db.commit()
     db.refresh(materia)
     return materia
 
 
-def delete_materia(db: Session, materia_id: uuid.UUID) -> bool:
-    """
-    Elimina una materia de la base de datos.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        materia_id (uuid.UUID): ID único de la materia.
-
-    Returns:
-        bool: True si se eliminó exitosamente, False si no existe.
-    """
+def eliminar_materia(db: Session, materia_id: uuid.UUID):
     materia = db.query(Materia).filter(Materia.id_materia == materia_id).first()
-    if materia is None:
-        return False
-
-    db.delete(materia)
-    db.commit()
-    return True
+    if materia:
+        db.delete(materia)
+        db.commit()
+        return materia
+    else:
+        print("No se encontró ninguna materia con ese ID.")
+        return None

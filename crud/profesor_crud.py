@@ -1,95 +1,78 @@
-# crud_profesor.py
-from sqlalchemy.orm import Session
-from models.profesor import Profesor
 import uuid
-from typing import List, Optional
+from sqlalchemy.orm import Session
+from models.persona import Persona
+from models.profesor import Profesor
+from sqlalchemy.orm import joinedload
 
 
-def create_profesor(db: Session, persona_id: uuid.UUID, especialidad: str) -> Profesor:
-    """
-    Crea un nuevo profesor en la base de datos.
+def create_profesor(
+    db: Session, nombre: str, email: str, telefono: str, especialidad: str
+):
+    nueva_persona = Persona(
+        id_persona=uuid.uuid4(), nombre=nombre, email=email, telefono=telefono
+    )
+    db.add(nueva_persona)
+    db.commit()
+    db.refresh(nueva_persona)
 
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        persona_id (uuid.UUID): ID de la persona asociada.
-        especialidad (str): Especialidad del profesor.
-
-    Returns:
-        Profesor: Objeto del profesor recién creado.
-    """
-    profesor = Profesor(id_profesor=persona_id, especialidad=especialidad)
+    profesor = Profesor(
+        id_profesor=uuid.uuid4(),
+        persona_id=nueva_persona.id_persona,
+        especialidad=especialidad,
+    )
     db.add(profesor)
     db.commit()
     db.refresh(profesor)
+
     return profesor
 
 
-def get_profesor_by_id(db: Session, profesor_id: uuid.UUID) -> Optional[Profesor]:
-    """
-    Obtiene un profesor por su ID.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        profesor_id (uuid.UUID): ID único del profesor.
-
-    Returns:
-        Optional[Profesor]: El profesor si existe, en caso contrario None.
-    """
-    return db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
+def listar_profesores(db: Session):
+    profesores = db.query(Profesor).options(joinedload(Profesor.persona)).all()
+    for p in profesores:
+        print(
+            f"ID: {p.id_profesor}, Nombre: {p.persona.nombre}, Email: {p.persona.email}, Teléfono: {p.persona.telefono}, Especialidad: {p.especialidad}"
+        )
+    return profesores
 
 
-def get_all_profesores(db: Session) -> List[Profesor]:
-    """
-    Obtiene todos los profesores registrados.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-
-    Returns:
-        List[Profesor]: Lista de todos los profesores.
-    """
-    return db.query(Profesor).all()
-
-
-def update_profesor(db: Session, profesor_id: uuid.UUID, especialidad: Optional[str] = None) -> Optional[Profesor]:
-    """
-    Actualiza los datos de un profesor existente.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        profesor_id (uuid.UUID): ID único del profesor.
-        especialidad (Optional[str]): Nueva especialidad del profesor.
-
-    Returns:
-        Optional[Profesor]: El profesor actualizado o None si no existe.
-    """
+def actualizar_profesor(
+    db: Session,
+    profesor_id: uuid.UUID,
+    nuevo_nombre: str = None,
+    nuevo_email: str = None,
+    nuevo_telefono: str = None,
+    nueva_especialidad: str = None,
+):
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
-    if profesor is None:
-        return None
+    if profesor:
+        persona = (
+            db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
+        )
+        if persona:
+            if nuevo_nombre:
+                persona.nombre = nuevo_nombre
+            if nuevo_email:
+                persona.email = nuevo_email
+            if nuevo_telefono:
+                persona.telefono = nuevo_telefono
+            db.add(persona)
 
-    if especialidad is not None:
-        profesor.especialidad = especialidad
+        if nueva_especialidad:
+            profesor.especialidad = nueva_especialidad
 
-    db.commit()
-    db.refresh(profesor)
+        db.commit()
+        db.refresh(profesor)
+        return profesor
+    return None
+
+
+def eliminar_profesor(db: Session, profesor_id: uuid.UUID):
+    profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
+    if profesor:
+        persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
+        if persona:
+            db.delete(persona)
+        db.delete(profesor)
+        db.commit()
     return profesor
-
-
-def delete_profesor(db: Session, profesor_id: uuid.UUID) -> bool:
-    """
-    Elimina un profesor de la base de datos.
-
-    Args:
-        db (Session): Sesión activa de SQLAlchemy.
-        profesor_id (uuid.UUID): ID único del profesor.
-
-    Returns:
-        bool: True si se eliminó exitosamente, False si no existe.
-    """
-    profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
-    if profesor is None:
-        return False
-
-    db.delete(profesor)
-    db.commit()
-    return True
