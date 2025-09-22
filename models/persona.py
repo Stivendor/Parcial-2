@@ -6,10 +6,13 @@ from sqlalchemy import Column, DateTime, String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
+
 class Persona(Base):
     __tablename__ = "personas"
 
-    id_persona = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    id_persona = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
+    )
     nombre = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     telefono = Column(String(50), nullable=False)

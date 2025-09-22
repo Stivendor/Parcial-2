@@ -1,4 +1,3 @@
-
 import os
 
 from dotenv import load_dotenv
@@ -33,7 +32,7 @@ Base = declarative_base()
 
 
 def get_db():
-   
+
     db = SessionLocal()
     try:
         yield db
@@ -42,5 +41,5 @@ def get_db():
 
 
 def create_tables():
-    
+
     Base.metadata.create_all(bind=engine)

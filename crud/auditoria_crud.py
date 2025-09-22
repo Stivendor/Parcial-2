@@ -1,23 +1,22 @@
-
 from typing import List, Optional
 import uuid
 from sqlalchemy.orm import Session
 from models.auditoria import Auditoria
 
 
-def create_auditoria(db: Session, usuario_id: uuid.UUID | None, accion: str, tabla: str):
-   
-    auditoria = Auditoria(
-        usuario_id=usuario_id,
-        accion=accion,
-        tabla=tabla
-    )
+def create_auditoria(
+    db: Session, usuario_id: uuid.UUID | None, accion: str, tabla: str
+):
+
+    auditoria = Auditoria(usuario_id=usuario_id, accion=accion, tabla=tabla)
     db.add(auditoria)
     db.commit()
     db.refresh(auditoria)
 
+
 def get_auditoria(db: Session) -> List[Auditoria]:
     return db.query(Auditoria).all()
+
 
 def ver_auditoria(db):
     auditorias = db.query(Auditoria).order_by(Auditoria.fecha.desc()).all()
