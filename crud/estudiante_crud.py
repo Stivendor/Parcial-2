@@ -45,7 +45,6 @@ def actualizar_estudiante(
 ):
     estudiante = db.query(Estudiante).filter(Estudiante.id_estudiante == estudiante_id).first()
     if estudiante:
-        """ Buscar persona asociada para actualizar nombre, email y teléfono """
         persona = db.query(Persona).filter(Persona.id_persona == estudiante.persona_id).first()
         if persona:
             if nombre is not None:
