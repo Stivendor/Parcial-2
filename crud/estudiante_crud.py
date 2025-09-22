@@ -15,7 +15,6 @@ def create_estudiante(db: Session, nombre: str, email: str, telefono: str, carre
     db.commit()
     db.refresh(estudiante)
 
-    """ Auditoría: creación de estudiante"""
     if usuario_id:
         from models.auditoria import Auditoria
         auditoria = Auditoria(
@@ -56,7 +55,6 @@ def actualizar_estudiante(
             if telefono is not None:
                 persona.telefono = telefono
 
-        """ Actualizar datos del estudiante"""
         if carrera is not None:
             estudiante.carrera = carrera
         if semestre is not None:
@@ -65,7 +63,6 @@ def actualizar_estudiante(
         db.commit()
         db.refresh(estudiante)
 
-        """ Auditoría: actualización de estudiante"""
         if usuario_id:
             from models.auditoria import Auditoria
             auditoria = Auditoria(
@@ -85,7 +82,6 @@ def eliminar_estudiante(db: Session, estudiante_id: uuid.UUID, usuario_id=None):
         db.delete(estudiante)
         db.commit()
 
-        """ Auditoría: eliminación de estudiante"""
         if usuario_id:
             from models.auditoria import Auditoria
             auditoria = Auditoria(

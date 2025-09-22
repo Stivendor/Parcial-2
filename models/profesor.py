@@ -1,5 +1,3 @@
-
-""" profesor """
 import uuid
 from database.config import Base
 from sqlalchemy import Column, String, ForeignKey

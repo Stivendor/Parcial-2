@@ -16,7 +16,6 @@ class Periodo(Base):
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
     fecha_edicion = Column(DateTime(timezone=True), onupdate=func.now())
 
-    """ Relación con Grupo """
     grupos = relationship("Grupo", back_populates="periodo")
 
     def __repr__(self):

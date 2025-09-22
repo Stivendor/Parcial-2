@@ -47,7 +47,6 @@ def actualizar_materia(db: Session, materia_id: uuid.UUID, nombre: str = None, c
         materia.nombre = nombre
     if codigo is not None and codigo != "":
         materia.codigo = codigo
-        """ ahora es opcional"""
     if creditos is not None:
         materia.creditos = creditos
 

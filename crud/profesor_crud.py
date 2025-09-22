@@ -28,7 +28,6 @@ def create_profesor(db: Session, nombre: str, email: str, telefono: str, especia
 
 
 def listar_profesores(db: Session):
-    """ Traer también la info de persona usando joinedload"""
     profesores = db.query(Profesor).options(joinedload(Profesor.persona)).all()
     for p in profesores:
         print(f"ID: {p.id_profesor}, Nombre: {p.persona.nombre}, Email: {p.persona.email}, Teléfono: {p.persona.telefono}, Especialidad: {p.especialidad}")
@@ -67,7 +66,6 @@ def actualizar_profesor(
 def eliminar_profesor(db: Session, profesor_id: uuid.UUID):
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
     if profesor:
-        """ Eliminar también la persona asociada"""
         persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
         if persona:
             db.delete(persona)
