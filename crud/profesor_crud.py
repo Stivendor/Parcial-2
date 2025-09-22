@@ -1,56 +1,48 @@
+################## profesor_crud #######################
 import uuid
 from sqlalchemy.orm import Session
-from models import Auditoria
-from models.profesor import Profesor
 from models.persona import Persona
+from models.profesor import Profesor
 
-def create_profesor(db, nombre, email, telefono, especialidad):
-    persona = Persona(
+def create_profesor(db: Session, nombre: str, email: str, telefono: str, especialidad: str):
+
+    nueva_persona = Persona(
+        id_persona=uuid.uuid4(),
         nombre=nombre,
         email=email,
         telefono=telefono
     )
-    db.add(persona)
+    db.add(nueva_persona)
     db.commit()
-    db.refresh(persona)
+    db.refresh(nueva_persona)
 
     profesor = Profesor(
-        id_profesor=persona.id_persona,
+        id_profesor=uuid.uuid4(),
+        persona_id=nueva_persona.id_persona,
         especialidad=especialidad
     )
-    
     db.add(profesor)
     db.commit()
     db.refresh(profesor)
+
     return profesor
 
-
 def listar_profesores(db: Session):
-    profesores = db.query(Profesor).all()
-    for p in profesores:
-        print(f"{p.id_profesor} - {p.persona.nombre} - {p.especialidad}")
+    return db.query(Profesor).all()
 
-def actualizar_profesor(db: Session, profesor_id: uuid.UUID, usuario_id: uuid.UUID):
-    profesor = db.query(Profesor).get(profesor_id)
-    if not profesor:
-        print("Profesor no encontrado")
-        return
+def actualizar_profesor(db: Session, profesor_id: uuid.UUID, especialidad: str = None):
+    profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
+    if profesor:
+        if especialidad:
+            profesor.especialidad = especialidad
+        db.commit()
+        db.refresh(profesor)
+    return profesor
 
-    profesor.especialidad = input(f"Especialidad ({profesor.especialidad}): ") or profesor.especialidad
-    db.add(profesor)
-    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Actualizó profesor {profesor.persona.nombre}", tabla="profesores")
-    db.add(auditoria)
-    db.commit()
-    print(f"✅ Profesor {profesor.persona.nombre} actualizado")
+def eliminar_profesor(db: Session, profesor_id: uuid.UUID):
+    profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
+    if profesor:
+        db.delete(profesor)
+        db.commit()
+    return profesor
 
-def eliminar_profesor(db: Session, profesor_id: uuid.UUID, usuario_id: uuid.UUID):
-    profesor = db.query(Profesor).get(profesor_id)
-    if not profesor:
-        print("Profesor no encontrado")
-        return
-
-    db.delete(profesor)
-    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Eliminó profesor {profesor.persona.nombre}", tabla="profesores")
-    db.add(auditoria)
-    db.commit()
-    print(f"Profesor {profesor.persona.nombre} eliminado")
