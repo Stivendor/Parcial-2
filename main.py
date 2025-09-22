@@ -6,11 +6,10 @@ from crud.usuario_crud import autenticar_usuario
 from crud.estudiante_crud import create_estudiante, listar_estudiantes, actualizar_estudiante, eliminar_estudiante
 from crud.profesor_crud import create_profesor, listar_profesores, actualizar_profesor, eliminar_profesor
 from crud.materia_crud import create_materia, listar_materias, actualizar_materia, eliminar_materia
-from crud.nota_crud import create_nota, get_all_notas, update_nota, delete_nota
+from crud.nota_crud import create_nota, listar_notas, actualizar_nota, eliminar_nota
 from crud.auditoria_crud import ver_auditoria
-from crud.usuario_crud import autenticar_usuario
 
-# ==================== MENÚS ====================
+
 
 def menu_estudiantes(usuario):
     db = SessionLocal()
@@ -24,7 +23,13 @@ def menu_estudiantes(usuario):
         opcion = input("Opción: ")
 
         if opcion == "1":
-            listar_estudiantes(db)
+            estudiantes = listar_estudiantes(db)
+            if not estudiantes:
+                print(" No hay estudiantes registrados.")
+            else:
+                for est in estudiantes:
+                    print(f"ID: {est.id_estudiante}, Nombre: {est.persona.nombre}, Carrera: {est.carrera}, Semestre: {est.semestre}")
+
         elif opcion == "2":
             nombre = input("Nombre: ")
             email = input("Email: ")
@@ -32,19 +37,73 @@ def menu_estudiantes(usuario):
             carrera = input("Carrera: ")
             semestre = int(input("Semestre: "))
             create_estudiante(db, nombre, email, telefono, carrera, semestre, usuario.id_usuario)
+            print("Estudiante creado correctamente.")
+
         elif opcion == "3":
-            estudiante_id = input("ID del estudiante: ")
-            nuevo_nombre = input("Nuevo nombre: ")
-            nuevo_email = input("Nuevo email: ")
-            nuevo_telefono = input("Nuevo teléfono: ")
-            nueva_carrera = input("Nueva carrera: ")
-            nuevo_semestre = int(input("Nuevo semestre: "))
-            actualizar_estudiante(db, estudiante_id, nuevo_nombre, nuevo_email, nuevo_telefono, nueva_carrera, nuevo_semestre, usuario.id_usuario)
+            estudiantes = listar_estudiantes(db)
+            if not estudiantes:
+                print("No hay estudiantes para actualizar.")
+                continue
+
+            for est in estudiantes:
+                print(f"{est.id_estudiante} - {est.persona.nombre} ({est.carrera}, Sem {est.semestre})")
+
+            estudiante_id = input("\nID del estudiante a actualizar: ")
+            try:
+                estudiante_uuid = uuid.UUID(estudiante_id)
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            nuevo_nombre = input("Nuevo nombre (ENTER para no cambiar): ") or None
+            nuevo_email = input("Nuevo email (ENTER para no cambiar): ") or None
+            nuevo_telefono = input("Nuevo teléfono (ENTER para no cambiar): ") or None
+            nueva_carrera = input("Nueva carrera (ENTER para no cambiar): ") or None
+            semestre_input = input("Nuevo semestre (ENTER para no cambiar): ")
+            nuevo_semestre = int(semestre_input) if semestre_input.strip() else None
+
+            estudiante_actualizado = actualizar_estudiante(
+                db,
+                estudiante_uuid,
+                nuevo_nombre,
+                nuevo_email,
+                nuevo_telefono,
+                nueva_carrera,
+                nuevo_semestre,
+                usuario.id_usuario
+            )
+
+            if estudiante_actualizado:
+                print("Estudiante actualizado correctamente.")
+            else:
+                print("No se encontró estudiante con ese ID.")
+
         elif opcion == "4":
-            estudiante_id = input("ID del estudiante: ")
-            eliminar_estudiante(db, estudiante_id, usuario.id_usuario)
+            estudiantes = listar_estudiantes(db)
+            if not estudiantes:
+                print("No hay estudiantes para eliminar.")
+                continue
+
+            for est in estudiantes:
+                print(f"{est.id_estudiante} - {est.persona.nombre}")
+
+            estudiante_id = input("ID del estudiante a eliminar: ")
+            try:
+                estudiante_uuid = uuid.UUID(estudiante_id)
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            eliminado = eliminar_estudiante(db, estudiante_uuid, usuario.id_usuario)
+            if eliminado:
+                print("🗑️ Estudiante eliminado correctamente.")
+            else:
+                print("No se encontró estudiante con ese ID.")
+
         elif opcion == "0":
             break
+        else:
+            print("Opción inválida, intente de nuevo.")
     db.close()
 
 
@@ -61,112 +120,216 @@ def menu_profesores(usuario):
 
         if opcion == "1":
             listar_profesores(db)
+
         elif opcion == "2":
             nombre = input("Nombre: ")
             email = input("Email: ")
             telefono = input("Teléfono: ")
-            departamento = input("Departamento: ")
-            create_profesor(db, nombre, email, telefono, departamento)
+            especialidad = input("Especialidad: ")
+            create_profesor(db, nombre, email, telefono, especialidad)
+            print(" Profesor creado correctamente.")
+
         elif opcion == "3":
-            profesor_id = input("ID del profesor: ")
-            nuevo_nombre = input("Nuevo nombre: ")
-            nuevo_email = input("Nuevo email: ")
-            nuevo_telefono = input("Nuevo teléfono: ")
-            nuevo_departamento = input("Nuevo departamento: ")
-            actualizar_profesor(db, profesor_id, nuevo_nombre, nuevo_email, nuevo_telefono, nuevo_departamento, usuario.id_usuario)
+            # Listar antes para que el usuario vea los IDs
+            profesores = listar_profesores(db)
+            if not profesores:
+                print(" No hay profesores registrados.")
+                continue
+
+            profesor_id = input("ID del profesor a actualizar: ")
+            try:
+                profesor_uuid = uuid.UUID(profesor_id)
+            except ValueError:
+                print(" ID inválido.")
+                continue
+
+            nuevo_nombre = input("Nuevo nombre (deja vacío para no cambiar): ") or None
+            nuevo_email = input("Nuevo email (deja vacío para no cambiar): ") or None
+            nuevo_telefono = input("Nuevo teléfono (deja vacío para no cambiar): ") or None
+            nueva_especialidad = input("Nueva especialidad (deja vacío para no cambiar): ") or None
+
+            profesor_actualizado = actualizar_profesor(
+                db,
+                profesor_uuid,
+                nuevo_nombre,
+                nuevo_email,
+                nuevo_telefono,
+                nueva_especialidad
+            )
+
+            if profesor_actualizado:
+                print("Profesor actualizado correctamente.")
+            else:
+                print("No se encontró profesor con ese ID.")
+
         elif opcion == "4":
-            profesor_id = input("ID del profesor: ")
-            eliminar_profesor(db, profesor_id, usuario.id_usuario)
+            profesores = listar_profesores(db)
+            if not profesores:
+                print("No hay profesores registrados.")
+                continue
+
+            profesor_id = input("ID del profesor a eliminar: ")
+            try:
+                profesor_uuid = uuid.UUID(profesor_id)
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            eliminado = eliminar_profesor(db, profesor_uuid)
+            if eliminado:
+                print("Profesor eliminado correctamente.")
+            else:
+                print("No se encontró profesor con ese ID.")
+
         elif opcion == "0":
             break
+        else:
+            print("Opción inválida.")
     db.close()
 
 
 def menu_materias(usuario, db):
     while True:
-        print("\n=== Gestión de Materias ===")
-        print("1. Crear materia")
-        print("2. Listar materias")
+        print("\n=== MATERIAS ===")
+        print("1. Listar materias")
+        print("2. Crear materia")
         print("3. Actualizar materia")
         print("4. Eliminar materia")
         print("0. Volver")
-
         opcion = input("Opción: ")
 
         if opcion == "1":
-            nombre = input("Nombre: ")
-            codigo = input("Código: ")
-            creditos = input("Créditos: ")
-
-            materia = create_materia(db, nombre, codigo, creditos)
-            auditoria = Auditoria(
-                usuario_id=usuario.id_usuario,
-                accion=f"Creó materia {materia.nombre}",
-                tabla="materias"
-            )
-            db.add(auditoria)
-            db.commit()
-            print(f"Materia {materia.nombre} creada")
+            materias = listar_materias(db)
+            if materias:
+                print("\n--- Lista de Materias ---")
+                for mat in materias:
+                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+            else:
+                print("No hay materias registradas.")
 
         elif opcion == "2":
-            listar_materias(db)
+            nombre = input("Nombre de la materia: ")
+            codigo = input("Código: ")
+            creditos = int(input("Créditos: "))
+            profesores = listar_profesores(db)
+            if not profesores:
+                print("No hay profesores registrados.")
+                continue
+            profesor_id = input("ID del profesor (o Enter si no tiene): ") or None
+            nueva_materia = create_materia(db, nombre, codigo, creditos, profesor_id, usuario.id_usuario)
+            print(f" Materia creada: {nueva_materia.nombre}")
 
         elif opcion == "3":
-            listar_materias(db)
-            materia_id = input("ID de la materia a actualizar: ")
-            actualizar_materia(db, uuid.UUID(materia_id), usuario.id_usuario)
+            materias = listar_materias(db)
+            if materias:
+                print("\n--- Lista de Materias ---")
+                for mat in materias:
+                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+            else:
+                print("No hay materias registradas.")
+                continue  # Salir de la opción si no hay materias
 
+            materia_id_input = input("ID de la materia a actualizar: ").strip()
+            try:
+                materia_id = uuid.UUID(materia_id_input)
+            except ValueError:
+                print("ID de materia no válido.")
+                continue
+
+            nombre = input("Nuevo nombre (Enter para omitir): ").strip() or None
+            codigo = input("Nuevo código (Enter para omitir): ").strip() or None
+            creditos_input = input("Nuevos créditos (Enter para omitir): ").strip()
+            creditos = int(creditos_input) if creditos_input else None
+
+            # Llamada correcta a actualizar_materia, sin tocar profesor_id
+            materia_actualizada = actualizar_materia(db, materia_id, nombre, codigo, creditos)
+
+            print("\n")
+            print("Materia actualizada correctamente." if materia_actualizada else "Materia no encontrada.")
+                        
         elif opcion == "4":
-            listar_materias(db)
-            materia_id = input("ID de la materia a eliminar: ")
-            eliminar_materia(db, uuid.UUID(materia_id), usuario.id_usuario)
+            materias = listar_materias(db)
+            if materias:
+                print("\n--- Lista de Materias ---")
+                for mat in materias:
+                    print(f"ID: {mat.id_materia} | Nombre: {mat.nombre} | Código: {mat.codigo} | Créditos: {mat.creditos} | Profesor: {mat.profesor.persona.nombre if mat.profesor else 'Sin asignar'}")
+            materia_id = input("ID de la materia a eliminar: ").strip()
+            materia_eliminada = eliminar_materia(db, materia_id)
+            if materia_eliminada:
+                print(" Materia eliminada correctamente.")
+            else:
+                print(" Materia no encontrada.")
 
         elif opcion == "0":
             break
         else:
-            print("Opción inválida")
+            print(" Opción no válida.")
 
 def menu_notas(usuario, db):
     while True:
-        print("\n=== NOTAS ===")
+        print("\n===== MENÚ NOTAS =====")
         print("1. Listar notas")
-        print("2. Crear nota")
-        print("3. Actualizar nota")
-        print("4. Eliminar nota")
+        print("2. Agregar nota")
+        print("3. Actualizar nota (solo valor)")
         print("0. Volver")
-
         opcion = input("Opción: ")
 
         if opcion == "1":
-            notas = get_all_notas(db)
-            for nota in notas:
-                print(f"ID: {nota.id_nota}, Estudiante: {nota.estudiante_id}, Materia: {nota.materia_id}, Valor: {nota.valor}")
+            notas = listar_notas(db)
+            if notas:
+                print("\n--- LISTADO DE NOTAS ---")
+                for nota in notas:
+                    print(f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}")
+            else:
+                print("No hay notas registradas.")
 
         elif opcion == "2":
-            estudiante_id = input("ID del estudiante: ")
-            materia_id = input("ID de la materia: ")
-            valor = float(input("Nota: ")) 
+            estudiantes = listar_estudiantes(db)
+            if not estudiantes:
+                print("No hay estudiantes registrados.")
+                continue
+            print("\n--- LISTA DE ESTUDIANTES ---")
+            for est in estudiantes:
+                print(f"ID: {est.id_estudiante}, Nombre: {est.persona.nombre}")
+
+            estudiante_id = input("ID del estudiante: ").strip()
+
+            materias = listar_materias(db)
+            if not materias:
+                print("No hay materias registradas.")
+                continue
+            print("\n--- LISTA DE MATERIAS ---")
+            for mat in materias:
+                print(f"ID: {mat.id_materia}, Nombre: {mat.nombre}")
+
+            materia_id = input("ID de la materia: ").strip()
+            valor = float(input("Nota: "))
 
             nueva_nota = create_nota(db, estudiante_id, materia_id, valor)
-            print(f"Nota creada: {nueva_nota}")
+            print(f"Nota agregada: {nueva_nota}")
 
         elif opcion == "3":
-            nota_id = input("ID de la nota a actualizar: ")
-            nuevo_valor = float(input("Nuevo valor de la nota: "))  
+            notas = listar_notas(db)
+            if not notas:
+                print("No hay notas registradas.")
+                continue
+            print("\n--- LISTADO DE NOTAS ---")
+            for nota in notas:
+                print(f"ID: {nota.id_nota}, Estudiante: {nota.estudiante.persona.nombre}, Materia: {nota.materia.nombre}, Valor: {nota.valor}")
 
-            update_nota(db, nota_id, nuevo_valor)
-            print("Nota actualizada correctamente")
-
-        elif opcion == "4":
-            nota_id = input("ID de la nota a eliminar: ")
-            delete_nota(db, nota_id)
-            print("Nota eliminada correctamente")
+            id_nota = input("ID de la nota a actualizar: ").strip()
+            nuevo_valor = float(input("Nuevo valor de la nota: "))
+            nota_actualizada = update_nota(db, id_nota, valor=nuevo_valor)
+            if nota_actualizada:
+                print(f"Nota actualizada: {nota_actualizada}")
+            else:
+                print("No se encontró la nota.")
 
         elif opcion == "0":
             break
-        else:
-            print("Opción inválida")
 
+        else:
+            print("Opción inválida, intente nuevamente.")
 
 
 def menu_auditoria():
@@ -175,8 +338,6 @@ def menu_auditoria():
     ver_auditoria(db)
     db.close()
 
-
-# ==================== MAIN ====================
 
 def menu_principal(usuario, db):
     while True:
@@ -200,12 +361,12 @@ def menu_principal(usuario, db):
         elif opcion == "5":
             menu_auditoria()
         elif opcion == "0":
-            print("Saliendo...")
+            print(" Saliendo...")
             break
+
 
 def main():
     db: Session = SessionLocal()
-
     username = input("Usuario: ")
     password = input("Contraseña: ")
 
@@ -213,9 +374,10 @@ def main():
 
     if usuario_logeado:
         print(f"Bienvenido {usuario_logeado.username} (rol: {usuario_logeado.rol})")
-        menu_principal(usuario_logeado, db)  
+        menu_principal(usuario_logeado, db)
     else:
         print("Usuario o contraseña incorrectos")
+
 
 if __name__ == "__main__":
     main()
