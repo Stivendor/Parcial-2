@@ -6,13 +6,18 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-
-""" Tabla intermedia para relación muchos a muchos entre Grupo y Estudiante"""
 grupo_estudiante = Table(
     "grupo_estudiante",
     Base.metadata,
-    Column("grupo_id", UUID(as_uuid=True), ForeignKey("grupos.id_grupo"), primary_key=True),
-    Column("estudiante_id", UUID(as_uuid=True), ForeignKey("estudiantes.id_estudiante"), primary_key=True),
+    Column(
+        "grupo_id", UUID(as_uuid=True), ForeignKey("grupos.id_grupo"), primary_key=True
+    ),
+    Column(
+        "estudiante_id",
+        UUID(as_uuid=True),
+        ForeignKey("estudiantes.id_estudiante"),
+        primary_key=True,
+    ),
 )
 
 
@@ -26,7 +31,6 @@ class Grupo(Base):
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
     fecha_edicion = Column(DateTime(timezone=True), onupdate=func.now())
 
-    """ Claves foráneas"""
     materia_id = Column(
         UUID(as_uuid=True), ForeignKey("materias.id_materia"), nullable=False
     )
@@ -34,7 +38,6 @@ class Grupo(Base):
         UUID(as_uuid=True), ForeignKey("profesores.id_profesor"), nullable=False
     )
 
-    """ Relaciones"""
     materia = relationship("Materia", backref="grupos")
     profesor = relationship("Profesor", backref="grupos")
     estudiantes = relationship(
@@ -45,10 +48,9 @@ class Grupo(Base):
 
     def __repr__(self):
         return f"<Grupo(id_grupo={self.id_grupo}, nombre='{self.nombre}')>"
-    
+
     periodo_id = Column(
-    UUID(as_uuid=True), ForeignKey("periodos.id_periodo"), nullable=False
+        UUID(as_uuid=True), ForeignKey("periodos.id_periodo"), nullable=False
     )
 
     periodo = relationship("Periodo", back_populates="grupos")
-
