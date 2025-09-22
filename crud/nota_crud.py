@@ -1,53 +1,29 @@
-
-
+import uuid
 from sqlalchemy.orm import Session
 from models.nota import Nota
-import uuid
-from typing import List, Optional
 
-
-def create_nota(db, estudiante_id, materia_id, valor):
-    nueva_nota = Nota(
-        estudiante_id=estudiante_id,
-        materia_id=materia_id,
-        valor=valor
-    )
+def create_nota(db: Session, estudiante_id: str, materia_id: str, valor: float):
+    nueva_nota = Nota(estudiante_id=estudiante_id, materia_id=materia_id, valor=valor)
     db.add(nueva_nota)
     db.commit()
     db.refresh(nueva_nota)
     return nueva_nota
 
-
-def get_nota_by_id(db: Session, nota_id: uuid.UUID) -> Optional[Nota]:
-    
-    return db.query(Nota).filter(Nota.id_nota == nota_id).first()
-
-
-def get_all_notas(db: Session) -> List[Nota]:
-    
+def listar_notas(db: Session):
     return db.query(Nota).all()
 
-
-def update_nota(db: Session, nota_id: uuid.UUID, valor: Optional[float] = None) -> Optional[Nota]:
-   
-    nota = db.query(Nota).filter(Nota.id_nota == nota_id).first()
-    if nota is None:
-        return None
-
-    if valor is not None:
-        nota.valor = valor
-
-    db.commit()
-    db.refresh(nota)
+def actualizar_nota(db: Session, id_nota: str, valor: float = None):
+    nota = db.query(Nota).filter(Nota.id_nota == id_nota).first()
+    if nota:
+        if valor is not None:
+            nota.valor = valor
+        db.commit()
+        db.refresh(nota)
     return nota
 
-
-def delete_nota(db: Session, nota_id: uuid.UUID) -> bool:
-
-    nota = db.query(Nota).filter(Nota.id_nota == nota_id).first()
-    if nota is None:
-        return False
-
-    db.delete(nota)
-    db.commit()
-    return True
+def eliminar_nota(db: Session, id_nota: str):
+    nota = db.query(Nota).filter(Nota.id_nota == id_nota).first()
+    if nota:
+        db.delete(nota)
+        db.commit()
+    return nota

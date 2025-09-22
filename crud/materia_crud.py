@@ -1,53 +1,67 @@
-
+# materia_crud.py
 import uuid
 from sqlalchemy.orm import Session
 from models.materia import Materia
-from models.auditoria import Auditoria
+from models.profesor import Profesor
 
-def create_materia(db: Session, nombre: str, codigo: str, creditos: int):
+def create_materia(db: Session, nombre: str, codigo: str, creditos: int, profesor_id: uuid.UUID = None, usuario_id=None):
     materia = Materia(
-        id_materia=uuid.uuid4(),
         nombre=nombre,
         codigo=codigo,
-        creditos=creditos
+        creditos=creditos,
+        profesor_id=profesor_id
     )
     db.add(materia)
     db.commit()
     db.refresh(materia)
+
+    if usuario_id:
+        from models.auditoria import Auditoria
+        auditoria = Auditoria(usuario_id=usuario_id, accion="Creación de materia", tabla="materias")
+        db.add(auditoria)
+        db.commit()
+
     return materia
+
 
 def listar_materias(db: Session):
     materias = db.query(Materia).all()
     for m in materias:
-        print(f"{m.id_materia} - {m.nombre} - {m.codigo} - {m.creditos} créditos")
+        profesor_nombre = m.profesor.persona.nombre if m.profesor else "Sin profesor asignado"
+        print(f"""
+        ID: {m.id_materia}
+        Nombre: {m.nombre}
+        Código: {m.codigo}
+        Créditos: {m.creditos}
+        Profesor: {profesor_nombre}
+        """)
+    return materias
 
-def actualizar_materia(db: Session, materia_id: uuid.UUID, usuario_id: uuid.UUID):
+
+def actualizar_materia(db: Session, materia_id: uuid.UUID, nombre: str = None, codigo: str = None, creditos: int = None, profesor_id: uuid.UUID = None):
     materia = db.query(Materia).filter(Materia.id_materia == materia_id).first()
     if not materia:
-        print("Materia no encontrada")
-        return
+        print("No se encontró ninguna materia con ese ID.")
+        return None
 
-    materia.nombre = input(f"Nombre ({materia.nombre}): ") or materia.nombre
-    materia.codigo = input(f"Código ({materia.codigo}): ") or materia.codigo
-    creditos = input(f"Créditos ({materia.creditos}): ")
-    if creditos.strip():
-        materia.creditos = int(creditos)
+    if nombre:
+        materia.nombre = nombre
+    if codigo is not None and codigo != "":
+        materia.codigo = codigo  # ahora es opcional
+    if creditos is not None:
+        materia.creditos = creditos
 
-    db.add(materia)
-    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Actualizó materia {materia.nombre}", tabla="materias")
-    db.add(auditoria)
     db.commit()
-    print(f"Materia {materia.nombre} actualizada")
+    db.refresh(materia)
+    return materia
 
-def eliminar_materia(db: Session, materia_id: uuid.UUID, usuario_id: uuid.UUID):
+
+def eliminar_materia(db: Session, materia_id: uuid.UUID):
     materia = db.query(Materia).filter(Materia.id_materia == materia_id).first()
-    if not materia:
-        print("Materia no encontrada")
-        return
-
-    db.delete(materia)
-    auditoria = Auditoria(usuario_id=usuario_id, accion=f"Eliminó materia {materia.nombre}", tabla="materias")
-    db.add(auditoria)
-    db.commit()
-    print(f"Materia {materia.nombre} eliminada")
-
+    if materia:
+        db.delete(materia)
+        db.commit()
+        return materia
+    else:
+        print("No se encontró ninguna materia con ese ID.")
+        return None
