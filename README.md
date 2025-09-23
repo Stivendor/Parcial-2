@@ -52,48 +52,48 @@ El proyecto está pensado para *prácticas de POO, manejo de **bases de datos re
 ## Instalación
 
 ### Clonar el repositorio
-
+```
 git clone https://github.com/Stivendor/Parcial-2.git
 cd Parcial-2
-
+```
 ---
 ## Crear un entorno virtual
-
+```
 python -m venv .venv
-
+```
 ---
 ## Activar el entorno virtual
 
 Windows (CMD o PowerShell):
-
+```
 .venv\Scripts\activate
-
+```
 
 Linux/Mac:
-
+```
 source .venv/bin/activate
-
+```
 ## Instalar dependencias
-
+```
 pip install -r requirements.txt
-
+```
 ## Configurar base de datos
 
 En database/config.py, agrega tu URL de PostgreSQL:
-
+```
 DATABASE_URL = "postgresql+psycopg2://usuario:contraseña@localhost:5432/escuela_db"
-
+```
 ## Ejecutar el sistema
-
+```
 python main.py
-
+```
 
 Sigue el menú interactivo para gestionar estudiantes, profesores, materias y notas.
-
-🔹 Nota: Los IDs no se pueden actualizar, solo los demás campos.
-
+```
+Nota: Los IDs no se pueden actualizar, solo los demás campos.
+```
 ## Estructura del Proyecto
-
+```
 Proyecto/ 
 │── main.py              # Archivo principal con menú
 │── database/
@@ -104,17 +104,17 @@ Proyecto/
 │── requirements.txt     # Dependencias del proyecto
 └── .vscode/
     └── settings.json    # Configuración de Black formatter
-
+```
 ## Formateo de Código
 
 El proyecto utiliza Black para mantener un formato uniforme.
 Con .vscode/settings.json configurado:
-
+```
 {
   "python.formatting.provider": "black",
   "editor.formatOnSave": true
 }
-
+```
 
 Cada vez que guardes un archivo .py, se formateará automáticamente.
 
@@ -128,3 +128,4 @@ Stiven Atehortua Ochoa
 
 ITM – Medellín, Colombia
 Estudiantes de Ingeniería
+
