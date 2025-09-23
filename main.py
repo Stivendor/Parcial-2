@@ -412,7 +412,6 @@ def main():
     usuario_logeado = None
 
     while intentos < max_intentos:
-        print("Usuario: usuario, Contraseña: 12345")
         username = input("Usuario: ")
         password = input("Contraseña: ")
 
