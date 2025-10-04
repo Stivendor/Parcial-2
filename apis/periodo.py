@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.config import get_db
-from crud import crud_periodo
+from crud import periodo_crud as crud_periodo
 from migrations.schemas import PeriodoCreate, PeriodoUpdate, PeriodoResponse
 
 router = APIRouter()

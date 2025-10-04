@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.config import get_db
-from crud import crud_grupo
+from crud import grupo_crud as crud_grupo
 from migrations.schemas import GrupoCreate, GrupoUpdate, GrupoResponse
 
 router = APIRouter()
