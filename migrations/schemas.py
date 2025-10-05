@@ -48,6 +48,9 @@ class PersonaResponse(PersonaBase):
     fecha_creacion: datetime
     fecha_edicion: Optional[datetime] = None
 
+    class Config:
+        from_attributes = True
+
 
 class UsuarioBase(BaseModel):
     """
@@ -91,6 +94,9 @@ class UsuarioResponse(UsuarioBase):
 
     id_usuario: UUID
     fecha_creacion: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class UsuarioLogin(BaseModel):
@@ -144,6 +150,9 @@ class EstudianteResponse(EstudianteBase):
     id_estudiante: UUID
     persona: PersonaResponse
 
+    class Config:
+        from_attributes = True
+
 
 # ==================== PROFESOR ====================
 class ProfesorBase(BaseModel):
@@ -155,7 +164,7 @@ class ProfesorCreate(PersonaBase, ProfesorBase):
     Schema para crear un profesor (incluye datos de persona).
     """
 
-    pass
+    usuario_id: Optional[UUID] = None
 
 
 class ProfesorUpdate(BaseModel):
@@ -176,6 +185,9 @@ class ProfesorResponse(ProfesorBase):
 
     id_profesor: UUID
     persona: PersonaResponse
+
+    class Config:
+        from_attributes = True
 
 
 # ==================== MATERIA ====================
@@ -220,6 +232,9 @@ class MateriaResponse(MateriaBase):
     fecha_creacion: datetime
     fecha_edicion: Optional[datetime] = None
 
+    class Config:
+        from_attributes = True
+
 
 # ==================== NOTA ====================
 class NotaBase(BaseModel):
@@ -258,6 +273,9 @@ class NotaResponse(NotaBase):
 
     id_nota: UUID
     fecha_creacion: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # ==================== GRUPO ====================
@@ -299,6 +317,9 @@ class GrupoResponse(GrupoBase):
     fecha_creacion: datetime
     fecha_edicion: Optional[datetime] = None
 
+    class Config:
+        from_attributes = True
+
 
 # ==================== PERIODO ====================
 class PeriodoBase(BaseModel):
@@ -339,6 +360,9 @@ class PeriodoResponse(PeriodoBase):
     id_periodo: UUID
     fecha_creacion: datetime
     fecha_edicion: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 # ==================== AUDITORIA ====================
