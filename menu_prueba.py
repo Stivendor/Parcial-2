@@ -1,7 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
+from database.config import Base, engine
 from apis import usuario, estudiante, auditoria, profesor, materia, nota, persona # importa tus routers
 
+Base.metadata.create_all(bind=engine)
 app = FastAPI(title="API Proyecto Estructura de Datos")
 
 # incluir routers
