@@ -107,3 +107,14 @@ def eliminar_estudiante(db: Session, estudiante_id: uuid.UUID, usuario_id=None):
             db.commit()
 
     return estudiante
+
+def get_estudiante_by_id(db: Session, estudiante_id: uuid.UUID):
+    """
+    Obtiene un estudiante por su ID, incluyendo los datos de la persona asociada.
+    """
+    return (
+        db.query(Estudiante)
+        .options(joinedload(Estudiante.persona))
+        .filter(Estudiante.id_estudiante == estudiante_id)
+        .first()
+    )
