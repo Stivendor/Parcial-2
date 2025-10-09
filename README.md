@@ -100,7 +100,7 @@ venv\Scripts\activate      # En Windows
 ```
 ### 3. Instalar dependencias
 ```bash
-pip install -r requirements.txt
+py -m pip install -r requirements.txt
 ```
 ### Configurar variables de entorno
 Crea un archivo .env en la raíz del proyecto con el siguiente contenido:
@@ -112,8 +112,7 @@ DATABASE_URL=postgresql+psycopg2://usuario:password@localhost:5432/escuela_db
 Ejecutar el servidor
 
 ```bash
-uvicorn main:app --reload
-
+py .\mainAPI.py
 ```
 Luego abre tu navegador en:
 ```bash
