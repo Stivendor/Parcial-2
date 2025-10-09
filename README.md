@@ -1,4 +1,4 @@
-# 📘 Proyecto Escuela - API REST con FastAPI y PostgreSQL
+# Proyecto Escuela - API REST con FastAPI y PostgreSQL
 
 Este proyecto implementa una **API REST** para la gestión de una escuela, desarrollada con **FastAPI**, **SQLAlchemy** y **PostgreSQL**, utilizando migraciones con **Alembic**.  
 
@@ -72,10 +72,13 @@ PARCIAL-2/
 │ ├── profesor.py
 │ └── usuarios.py
 │
-├── main.py
+├── .gitignore.py
+├── mainAPI.py
+├── mainORM.py
 ├── requirements.txt
 ├── alembic.ini
-├── .env
+├── .env # ESTE ARCHIVO SE DEBE CREAR AL CLONAR EL REPO
+├── pyproject.toml
 ├── README.md
 └── settings.json
 ```
