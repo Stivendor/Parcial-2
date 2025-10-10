@@ -1,130 +1,162 @@
-# Proyecto de Gestión Académica
+# Proyecto Escuela - API REST con FastAPI y PostgreSQL
 
-Este proyecto es un sistema de *gestión académica* desarrollado en *Python* utilizando *SQLAlchemy* como ORM y *PostgreSQL* como base de datos.  
-Permite administrar *estudiantes, profesores, materias y notas* mediante un menú interactivo en consola.  
-Además, incluye *auditoría* de acciones realizadas.
+Este proyecto implementa una **API REST** para la gestión de una escuela, desarrollada con **FastAPI**, **SQLAlchemy** y **PostgreSQL**, utilizando migraciones con **Alembic**.  
 
-El proyecto está pensado para *prácticas de POO, manejo de **bases de datos relacionales* y operaciones *CRUD* (Crear, Leer, Actualizar, Eliminar).
-
----
-
-## Funcionalidades
-
-### Estudiantes
-- Listar estudiantes  
-- Crear estudiante  
-- Actualizar estudiante (excepto ID)  
-- Eliminar estudiante  
-
-### Profesores
-- Listar profesores  
-- Crear profesor  
-- Actualizar profesor (excepto ID)  
-- Eliminar profesor  
-
-### Materias
-- Listar materias y su profesor asignado  
-- Crear materia (asignando profesor)  
-- Actualizar materia (excepto ID)  
-- Eliminar materia  
-
-### Notas
-- Listar notas  
-- Agregar nota (asignando estudiante y materia)  
-- Actualizar solo el valor de la nota  
-
-### Auditoría
-- Registrar acciones realizadas en el sistema  
-- Consultar historial de acciones  
+Permite administrar entidades como:
+- Usuarios (con UUID)
+- Profesores
+- Estudiantes
+- Grupos
+- Materias
+- Notas
+- Períodos académicos
+- Auditorías  
 
 ---
 
-## Tecnologías
+## Tecnologías principales
 
-- *Lenguaje:* Python 3.13  
-- *Base de datos:* PostgreSQL  
-- *ORM:* SQLAlchemy  
-- *Interfaz:* Consola interactiva  
-- *Herramientas:* VS Code, Black formatter  
+- [Python 3.12+](https://www.python.org/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Alembic](https://alembic.sqlalchemy.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Pydantic](https://docs.pydantic.dev/)
+- [Uvicorn](https://www.uvicorn.org/)
 
 ---
 
-## Instalación
+## Estructura del proyecto
+```bash
+PARCIAL-2/
+│
+├── apis/
+│ ├── auditoria.py
+│ ├── estudiante.py
+│ ├── grupo.py
+│ ├── materia.py
+│ ├── nota.py
+│ ├── periodo.py
+│ ├── profesor.py
+│ └── usuario.py
+│
+├── crud/
+│ ├── auditoria_crud.py
+│ ├── estudiante_crud.py
+│ ├── grupo_crud.py
+│ ├── materia_crud.py
+│ ├── nota_crud.py
+│ ├── periodo_crud.py
+│ ├── persona_crud.py
+│ ├── profesor_crud.py
+│ └── usuario_crud.py
+│
+├── database/
+│ ├── config.py
+│ └── init.py
+│
+├── migrations/
+│ ├── env.py
+│ ├── schemas.py
+│ ├── versions/
+│ └── script.py.mako
+│
+├── models/
+│ ├── auditoria.py
+│ ├── estudiante.py
+│ ├── grupo.py
+│ ├── materia.py
+│ ├── nota.py
+│ ├── periodo.py
+│ ├── persona.py
+│ ├── profesor.py
+│ └── usuarios.py
+│
+├── .gitignore.py
+├── mainAPI.py
+├── mainORM.py
+├── requirements.txt
+├── alembic.ini
+├── .env # ESTE ARCHIVO SE DEBE CREAR AL CLONAR EL REPO
+├── pyproject.toml
+├── README.md
+└── settings.json
+```
 
-### Clonar el repositorio
-```
-git clone https://github.com/Stivendor/Parcial-2.git
-cd Parcial-2
-```
 ---
-## Crear un entorno virtual
-```
-python -m venv .venv
-```
----
-## Activar el entorno virtual
 
-Windows (CMD o PowerShell):
-```
-.venv\Scripts\activate
-```
+## Configuración del entorno
 
-Linux/Mac:
+### 1️. Clonar el repositorio
+```bash
+git clone https://github.com/tu_usuario/tu_repositorio.git
+cd PARCIAL-2
 ```
-source .venv/bin/activate
+### 2. Crear y activar un entorno virtual
+```bash
+python -m venv venv
+source venv/bin/activate   # En Linux/Mac
+venv\Scripts\activate      # En Windows
 ```
-## Instalar dependencias
+### 3. Instalar dependencias
+```bash
+py -m pip install -r requirements.txt
 ```
-pip install -r requirements.txt
-```
-## Configurar base de datos
+### Configurar variables de entorno
+Crea un archivo .env en la raíz del proyecto con el siguiente contenido:
 
-En database/config.py, agrega tu URL de PostgreSQL:
-```
-DATABASE_URL = "postgresql+psycopg2://usuario:contraseña@localhost:5432/escuela_db"
-```
-## Ejecutar el sistema
-```
-python main.py
+```bash
+DATABASE_URL=postgresql+psycopg2://usuario:password@localhost:5432/escuela_db
 ```
 
-Sigue el menú interactivo para gestionar estudiantes, profesores, materias y notas.
-```
-Nota: Los IDs no se pueden actualizar, solo los demás campos.
-```
-## Estructura del Proyecto
-```
-Proyecto/ 
-│── main.py              # Archivo principal con menú
-│── database/
-│   ├── config.py        # Configuración de base de datos
-│   └── ...
-│── models/              # Definición de tablas
-│── crud/                # Funciones CRUD
-│── requirements.txt     # Dependencias del proyecto
-└── .vscode/
-    └── settings.json    # Configuración de Black formatter
-```
-## Formateo de Código
+Ejecutar el servidor
 
-El proyecto utiliza Black para mantener un formato uniforme.
-Con .vscode/settings.json configurado:
+```bash
+py .\mainAPI.py
 ```
-{
-  "python.formatting.provider": "black",
-  "editor.formatOnSave": true
-}
+Luego abre tu navegador en:
+```bash
+http://127.0.0.1:8000/docs
+```
+Ahí podrás explorar la documentación interactiva de la API.
+
+## Ejemplo de endpoint - Eliminar usuario
+
+Método: DELETE /usuarios/{usuario_id}
+```bash
+@router.delete("/{usuario_id}")
+def eliminar_usuario(usuario_id: str, db: Session = Depends(get_db)):
+    """
+    Elimina un usuario de la base de datos por su UUID.
+    """
+    eliminado = crud_usuario.delete_usuario(db, usuario_id)
+    if not eliminado:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {"mensaje": "Usuario eliminado correctamente"}
 ```
 
-Cada vez que guardes un archivo .py, se formateará automáticamente.
+Ejemplo de llamada:
+```bash
+DELETE /usuarios/3a0c7b6e-4e83-4208-b3f2-71a94801d33c
+```
 
-## Autores
+Dependencias principales
+```bash
+fastapi
+uvicorn
+sqlalchemy
+alembic
+psycopg2
+python-dotenv
+pydantic
+```
 
-Julián Bermeo Cuellar
 
-Stiven Atehortua Ochoa
+# Autores
 
-Ángel Gutiérrez Ladino
+### Julián Bermeo Cuellar
+### Stiven Atehortua Ochoa
+### Ángel Gutiérrez Ladino
 
 ITM – Medellín, Colombia
 Estudiantes de Ingeniería

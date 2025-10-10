@@ -1,39 +1,47 @@
 import uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.persona import Persona
 from models.profesor import Profesor
-from sqlalchemy.orm import joinedload
+from models.usuarios import Usuario
 
 
 def create_profesor(
-    db: Session, nombre: str, email: str, telefono: str, especialidad: str
+    db: Session,
+    nombre: str,
+    email: str,
+    telefono: str,
+    especialidad: str,
+    usuario_id=None,
 ):
-    nueva_persona = Persona(
-        id_persona=uuid.uuid4(), nombre=nombre, email=email, telefono=telefono
-    )
-    db.add(nueva_persona)
+    # Crear persona primero
+    persona = Persona(nombre=nombre, email=email, telefono=telefono)
+    db.add(persona)
     db.commit()
-    db.refresh(nueva_persona)
+    db.refresh(persona)
 
-    profesor = Profesor(
-        id_profesor=uuid.uuid4(),
-        persona_id=nueva_persona.id_persona,
-        especialidad=especialidad,
-    )
+    # Crear profesor asociado
+    profesor = Profesor(persona_id=persona.id_persona, especialidad=especialidad)
     db.add(profesor)
     db.commit()
     db.refresh(profesor)
+
+    # Registrar auditoría si aplica
+    if usuario_id:
+        from models.auditoria import Auditoria
+        auditoria = Auditoria(
+            usuario_id=usuario_id,
+            accion="Creación de profesor",
+            tabla="profesores",
+        )
+        db.add(auditoria)
+        db.commit()
 
     return profesor
 
 
 def listar_profesores(db: Session):
-    profesores = db.query(Profesor).options(joinedload(Profesor.persona)).all()
-    for p in profesores:
-        print(
-            f"ID: {p.id_profesor}, Nombre: {p.persona.nombre}, Email: {p.persona.email}, Teléfono: {p.persona.telefono}, Especialidad: {p.especialidad}"
-        )
-    return profesores
+    """Lista todos los profesores con su persona asociada."""
+    return db.query(Profesor).options(joinedload(Profesor.persona)).all()
 
 
 def actualizar_profesor(
@@ -46,9 +54,7 @@ def actualizar_profesor(
 ):
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
     if profesor:
-        persona = (
-            db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
-        )
+        persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
         if persona:
             if nuevo_nombre:
                 persona.nombre = nuevo_nombre
@@ -56,7 +62,6 @@ def actualizar_profesor(
                 persona.email = nuevo_email
             if nuevo_telefono:
                 persona.telefono = nuevo_telefono
-            db.add(persona)
 
         if nueva_especialidad:
             profesor.especialidad = nueva_especialidad
@@ -68,11 +73,19 @@ def actualizar_profesor(
 
 
 def eliminar_profesor(db: Session, profesor_id: uuid.UUID):
+    """
+    Elimina un profesor si no tiene un usuario asociado.
+    Si existe un usuario vinculado, lanza una excepción controlada.
+    """
     profesor = db.query(Profesor).filter(Profesor.id_profesor == profesor_id).first()
-    if profesor:
-        persona = db.query(Persona).filter(Persona.id_persona == profesor.persona_id).first()
-        if persona:
-            db.delete(persona)
-        db.delete(profesor)
-        db.commit()
+    if not profesor:
+        return None
+
+    # Verificar si hay usuario vinculado
+    usuario = db.query(Usuario).filter(Usuario.profesor_id == profesor_id).first()
+    if usuario:
+        raise Exception("No se puede eliminar: el profesor tiene un usuario asociado.")
+
+    db.delete(profesor)
+    db.commit()
     return profesor
